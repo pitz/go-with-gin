@@ -1,4 +1,4 @@
-package http
+package httpClient
 
 import (
 	"fmt"
@@ -9,7 +9,13 @@ import (
 	adapters "pitzdev/web-service-gin/out/adapters"
 )
 
-func GetScore(analyse *models.Analyse) (int, error) {
+type HttpClient struct{}
+
+func New() *HttpClient {
+	return &HttpClient{}
+}
+
+func (h *HttpClient) GetScore(analyse *models.Analyse) (int, error) {
 	fmt.Printf("[GetScore] Fetching score for Analyse %v\n", analyse.ID())
 
 	url := "https://gingo.free.beeceptor.com/api/users"
@@ -27,5 +33,11 @@ func GetScore(analyse *models.Analyse) (int, error) {
 		return 0, err
 	}
 
-	return adapters.ParseScore(body)
+	score, err := adapters.ParseScore(body)
+	if err != nil {
+		fmt.Printf("[GetScore] Error parsing response body for Analyse %v: %v\n. It's going to use fallback.", analyse.ID(), err)
+		return 0, nil
+	}
+
+	return score, nil
 }

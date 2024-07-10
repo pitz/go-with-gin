@@ -4,44 +4,74 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
+	"pitzdev/web-service-gin/models"
+	httpOut "pitzdev/web-service-gin/out/http"
 
-	models "pitzdev/web-service-gin/models"
-	http "pitzdev/web-service-gin/out/http"
+	"github.com/google/uuid"
 )
 
-var AnalyseQueue = []models.Analyse{}
-
-func validateAnalyse(analyse *models.Analyse) error {
-	if analyse.ExternalId == "" {
-		return errors.New("invalid ExternalID")
-	}
-
-	return nil
+type AnalyseController struct {
+	httpClient   *httpOut.HttpClient
+	analyseQueue []models.Analyse
 }
 
-func ScheduleExecution(analyse *models.Analyse) error {
-	err := validateAnalyse(analyse)
-	if err != nil {
+func (c *AnalyseController) ScheduleExecution(analyse *models.Analyse) error {
+	if err := c.validateAnalyse(analyse); err != nil {
 		return err
 	}
 
 	analyse.SetID(uuid.New().String())
-	AnalyseQueue = append(AnalyseQueue, *analyse)
+	c.addToQueue(analyse)
 
 	return nil
 }
 
-func ExecuteAnalyse(analyse *models.Analyse) error {
+func (c *AnalyseController) validateAnalyse(analyse *models.Analyse) error {
+	if analyse.ExternalId == "" {
+		return errors.New("invalid ExternalID")
+	}
+	return nil
+}
+
+func (c *AnalyseController) addToQueue(analyse *models.Analyse) {
+	c.analyseQueue = append(c.analyseQueue, *analyse)
+}
+
+func (c *AnalyseController) ExecuteAnalyse(analyse *models.Analyse) error {
 	fmt.Println("Execute: ", analyse.ID())
 
-	score, err := http.GetScore(analyse)
+	score, err := c.httpClient.GetScore(analyse)
 	if err != nil {
 		return err
 	}
 
-	// tmp
 	fmt.Println("Score: ", score)
+	c.RemoveAnalyse(analyse)
 
 	return nil
+}
+
+func (c *AnalyseController) AnalyseQueue() *[]models.Analyse {
+	return &c.analyseQueue
+}
+
+func (c *AnalyseController) RemoveAnalyse(analyseToRemove *models.Analyse) error {
+	fmt.Println("Remove Analyse: ", analyseToRemove.ID())
+
+	for i, analyse := range *c.AnalyseQueue() {
+		if analyse.ID() == analyseToRemove.ID() {
+			c.analyseQueue = append(c.analyseQueue[:i], c.analyseQueue[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("analyse not found")
+}
+
+func New(
+	httpClient *httpOut.HttpClient,
+) *AnalyseController {
+	return &AnalyseController{
+		httpClient:   httpClient,
+		analyseQueue: []models.Analyse{},
+	}
 }

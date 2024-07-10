@@ -2,16 +2,19 @@ package main
 
 import (
 	"fmt"
-	http "pitzdev/web-service-gin/in/http"
 	jobs "pitzdev/web-service-gin/in/jobs"
 	"time"
+
+	controllers "pitzdev/web-service-gin/controllers"
+	httpIn "pitzdev/web-service-gin/in/http"
+	httpOut "pitzdev/web-service-gin/out/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron"
 )
 
-func routingOrchestrator(router *gin.Engine) {
-	router.POST("/analyse", http.ExecuteAnalyse)
+func routingOrchestrator(router *gin.Engine, httpServer *httpIn.AnalyseHandler) {
+	router.POST("/analyse", httpServer.ExecuteAnalyse)
 
 	// router.GET("/analyse", handlers.GetWorkout)
 	// router.GET("/workouts/:id/executions", handlers.ListWorkoutExecutions)
@@ -19,23 +22,27 @@ func routingOrchestrator(router *gin.Engine) {
 	// router.POST("/workouts/:id/executions/", handlers.GetWorkoutExecution)
 }
 
-func scheduleJobs() {
+func scheduleJobs(analyseController *controllers.AnalyseController) {
 	c := cron.New()
 
 	c.AddFunc("@every 10s", func() {
 		fmt.Println("Cron job running at:", time.Now())
-		jobs.ProcessQueue()
+		jobs.ProcessQueue(analyseController)
 	})
 
 	c.Start()
 }
 
 func main() {
+	httpClient := httpOut.New()
+	analyseController := controllers.New(httpClient)
+	httpServer := httpIn.New(analyseController)
+
 	testingGoroutine()
-	scheduleJobs()
+	scheduleJobs(analyseController)
 
 	router := gin.Default()
-	routingOrchestrator(router)
+	routingOrchestrator(router, httpServer)
 
 	router.Run("localhost:8080")
 }

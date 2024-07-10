@@ -2,13 +2,17 @@ package http
 
 import (
 	"net/http"
-	controllers "pitzdev/web-service-gin/controllers"
-	adapters "pitzdev/web-service-gin/in/adapters"
+	"pitzdev/web-service-gin/controllers"
+	"pitzdev/web-service-gin/in/adapters"
 
 	"github.com/gin-gonic/gin"
 )
 
-func ExecuteAnalyse(context *gin.Context) {
+type AnalyseHandler struct {
+	controller *controllers.AnalyseController
+}
+
+func (h *AnalyseHandler) ExecuteAnalyse(context *gin.Context) {
 	analyse, parsingErr := adapters.ParseAnalyse(context)
 	if parsingErr != nil {
 		context.JSON(
@@ -17,7 +21,7 @@ func ExecuteAnalyse(context *gin.Context) {
 		return
 	}
 
-	scheduleError := controllers.ScheduleExecution(analyse)
+	scheduleError := h.controller.ScheduleExecution(analyse)
 	if scheduleError != nil {
 		context.JSON(
 			http.StatusBadRequest,
@@ -29,4 +33,8 @@ func ExecuteAnalyse(context *gin.Context) {
 		http.StatusCreated,
 		gin.H{"message": "Analyse scheduled with success!"},
 	)
+}
+
+func New(controller *controllers.AnalyseController) *AnalyseHandler {
+	return &AnalyseHandler{controller: controller}
 }
