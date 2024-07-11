@@ -1,21 +1,21 @@
-package httpClient
+package http
 
 import (
 	"fmt"
 	"io"
 	"net/http"
-	"pitzdev/web-service-gin/models"
 
-	adapters "pitzdev/web-service-gin/out/adapters"
+	"pitzdev/web-service-gin/models"
+	"pitzdev/web-service-gin/out/adapters"
 )
 
-type HttpClient struct{}
+type Client struct{}
 
-func New() *HttpClient {
-	return &HttpClient{}
+func New() *Client {
+	return &Client{}
 }
 
-func (h *HttpClient) GetScore(analyse *models.Analyse) (int, error) {
+func (h *Client) GetScore(analyse *models.Analyse) (int, error) {
 	fmt.Printf("[GetScore] Fetching score for Analyse %v\n", analyse.ID())
 
 	url := "https://gingo.free.beeceptor.com/api/users"

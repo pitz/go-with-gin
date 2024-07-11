@@ -3,8 +3,9 @@ package controllers
 import (
 	"errors"
 	"fmt"
+
 	"pitzdev/web-service-gin/models"
-	httpOut "pitzdev/web-service-gin/out/http"
+	"pitzdev/web-service-gin/out/http"
 
 	"github.com/google/uuid"
 )
@@ -17,7 +18,7 @@ type AnalyseControllerInterface interface {
 }
 
 type AnalyseController struct {
-	httpClient   *httpOut.HttpClient
+	httpClient   *http.Client
 	analyseQueue []models.Analyse
 }
 
@@ -47,7 +48,10 @@ func (c *AnalyseController) ExecuteAnalyse(analyse *models.Analyse) error {
 	}
 
 	fmt.Println("Score: ", score)
-	c.RemoveAnalyse(analyse)
+	err = c.RemoveAnalyse(analyse)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -68,7 +72,7 @@ func (c *AnalyseController) RemoveAnalyse(analyseToRemove *models.Analyse) error
 	return errors.New("analyse not found")
 }
 
-func New(httpClient *httpOut.HttpClient) *AnalyseController {
+func New(httpClient *http.Client) *AnalyseController {
 	return &AnalyseController{
 		httpClient:   httpClient,
 		analyseQueue: []models.Analyse{},

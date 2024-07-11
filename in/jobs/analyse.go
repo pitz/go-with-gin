@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	controllers "pitzdev/web-service-gin/controllers"
+	"pitzdev/web-service-gin/controllers"
 )
 
 var (

@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	jobs "pitzdev/web-service-gin/in/jobs"
 	"time"
 
-	controllers "pitzdev/web-service-gin/controllers"
+	"pitzdev/web-service-gin/controllers"
 	httpIn "pitzdev/web-service-gin/in/http"
+	"pitzdev/web-service-gin/in/jobs"
 	httpOut "pitzdev/web-service-gin/out/http"
 
 	"github.com/gin-gonic/gin"
