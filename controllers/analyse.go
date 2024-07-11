@@ -3,12 +3,18 @@ package controllers
 import (
 	"errors"
 	"fmt"
-
 	"pitzdev/web-service-gin/models"
 	httpOut "pitzdev/web-service-gin/out/http"
 
 	"github.com/google/uuid"
 )
+
+type AnalyseControllerInterface interface {
+	ScheduleExecution(analyse *models.Analyse) error
+	ExecuteAnalyse(analyse *models.Analyse) error
+	RemoveAnalyse(analyse *models.Analyse) error
+	AnalyseQueue() *[]models.Analyse
+}
 
 type AnalyseController struct {
 	httpClient   *httpOut.HttpClient
@@ -21,8 +27,7 @@ func (c *AnalyseController) ScheduleExecution(analyse *models.Analyse) error {
 	}
 
 	analyse.SetID(uuid.New().String())
-	c.addToQueue(analyse)
-
+	c.analyseQueue = append(c.analyseQueue, *analyse)
 	return nil
 }
 
@@ -31,10 +36,6 @@ func (c *AnalyseController) validateAnalyse(analyse *models.Analyse) error {
 		return errors.New("invalid ExternalID")
 	}
 	return nil
-}
-
-func (c *AnalyseController) addToQueue(analyse *models.Analyse) {
-	c.analyseQueue = append(c.analyseQueue, *analyse)
 }
 
 func (c *AnalyseController) ExecuteAnalyse(analyse *models.Analyse) error {
@@ -58,7 +59,7 @@ func (c *AnalyseController) AnalyseQueue() *[]models.Analyse {
 func (c *AnalyseController) RemoveAnalyse(analyseToRemove *models.Analyse) error {
 	fmt.Println("Remove Analyse: ", analyseToRemove.ID())
 
-	for i, analyse := range *c.AnalyseQueue() {
+	for i, analyse := range c.analyseQueue {
 		if analyse.ID() == analyseToRemove.ID() {
 			c.analyseQueue = append(c.analyseQueue[:i], c.analyseQueue[i+1:]...)
 			return nil
@@ -67,9 +68,7 @@ func (c *AnalyseController) RemoveAnalyse(analyseToRemove *models.Analyse) error
 	return errors.New("analyse not found")
 }
 
-func New(
-	httpClient *httpOut.HttpClient,
-) *AnalyseController {
+func New(httpClient *httpOut.HttpClient) *AnalyseController {
 	return &AnalyseController{
 		httpClient:   httpClient,
 		analyseQueue: []models.Analyse{},

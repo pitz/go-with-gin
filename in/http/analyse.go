@@ -9,7 +9,7 @@ import (
 )
 
 type AnalyseHandler struct {
-	controller *controllers.AnalyseController
+	controller controllers.AnalyseControllerInterface
 }
 
 func (h *AnalyseHandler) ExecuteAnalyse(context *gin.Context) {
@@ -35,6 +35,6 @@ func (h *AnalyseHandler) ExecuteAnalyse(context *gin.Context) {
 	)
 }
 
-func New(controller *controllers.AnalyseController) *AnalyseHandler {
+func New(controller controllers.AnalyseControllerInterface) *AnalyseHandler {
 	return &AnalyseHandler{controller: controller}
 }
