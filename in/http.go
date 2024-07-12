@@ -19,8 +19,7 @@ func (h *Http) ExecuteAnalyse(context *gin.Context) {
 		return
 	}
 
-	scheduleError := h.controller.ScheduleExecution(analyse)
-	if scheduleError != nil {
+	if scheduleError := h.controller.ScheduleExecution(analyse); scheduleError != nil {
 		context.JSON(
 			http.StatusBadRequest,
 			gin.H{"error": scheduleError.Error()})

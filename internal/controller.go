@@ -51,13 +51,18 @@ func (c *AnalyseController) ExecuteAnalyse(externalId string) error {
 		return errors.New("analyse not found")
 	}
 
-	score, err := c.httpClient.GetScore(&analyse)
-	if err != nil {
-		return err
-	}
+	ch := make(chan models.Score)
+	go c.httpClient.GetAdyenScore(&analyse, ch)
+	go c.httpClient.GetTransunionScore(&analyse, ch)
 
-	fmt.Println("Score: ", score)
-	err = c.RemoveAnalyse(&analyse)
+	var score models.Score
+	score = <-ch
+	fmt.Println("1. Score: ", score)
+
+	score = <-ch
+	fmt.Println("2. Score: ", score)
+
+	err := c.RemoveAnalyse(&analyse)
 	if err != nil {
 		return err
 	}

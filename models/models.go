@@ -21,3 +21,8 @@ func (analyse *Analyse) ID() string {
 func (analyse *Analyse) SetID(analyseId string) {
 	analyse.id = analyseId
 }
+
+type Score struct {
+	Score int
+	Error error
+}
