@@ -11,14 +11,13 @@ var (
 	mu sync.Mutex
 )
 
-func ProcessQueue(analyseController *internal.AnalyseController) {
+func ProcessQueue(c *internal.AnalyseController) {
 	fmt.Println("ProcessQueue: ", time.Now())
-	fmt.Println("- Queue: ", len(*analyseController.AnalyseQueue()))
 
 	mu.Lock()
 	defer mu.Unlock()
 
-	for _, analyse := range *analyseController.AnalyseQueue() {
-		analyseController.ExecuteAnalyse(&analyse)
+	for _, analyse := range c.PendingQueue() {
+		c.ExecuteAnalyse(analyse)
 	}
 }

@@ -15,6 +15,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// THIS IS NOT WORKING NOW
+// DUE TO MY LAST CHANGES ON THE CONTROLLER.
+
 type MockAnalyseController struct {
 	mock.Mock
 }
