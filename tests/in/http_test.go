@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"pitzdev/web-service-gin/in"
 	"pitzdev/web-service-gin/models"
+	"pitzdev/web-service-gin/tests/fixtures"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -15,37 +16,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// THIS IS NOT WORKING NOW
-// DUE TO MY LAST CHANGES ON THE CONTROLLER.
-
-type MockAnalyseController struct {
-	mock.Mock
-}
-
-func (m *MockAnalyseController) ScheduleExecution(analyse *models.Analyse) error {
-	args := m.Called(analyse)
-	return args.Error(0)
-}
-
-func (m *MockAnalyseController) ExecuteAnalyse(analyse *models.Analyse) error {
-	args := m.Called(analyse)
-	return args.Error(0)
-}
-
-func (m *MockAnalyseController) RemoveAnalyse(analyse *models.Analyse) error {
-	args := m.Called(analyse)
-	return args.Error(0)
-}
-
-func (m *MockAnalyseController) AnalyseQueue() *[]models.Analyse {
-	args := m.Called()
-	return args.Get(0).(*[]models.Analyse)
-}
-
 func TestExecuteAnalyse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	mockController := new(MockAnalyseController)
+	mockController := new(fixtures.MockAnalyseController)
 	handler := in.New(mockController)
 
 	t.Run("Testing valid analyse", func(t *testing.T) {
@@ -70,7 +44,7 @@ func TestExecuteAnalyse(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, w.Code)
 		assert.Contains(t, w.Body.String(), "Analyse scheduled with success!")
 
-		// and it should schedule the exectuion of the analysis
+		// and it should schedule the execution of the analysis
 		mockController.AssertCalled(t, "ScheduleExecution", mock.AnythingOfType("*models.Analyse"))
 	})
 
