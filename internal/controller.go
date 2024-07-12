@@ -1,13 +1,11 @@
-package controllers
+package internal
 
 import (
 	"errors"
 	"fmt"
-
-	"pitzdev/web-service-gin/models"
-	"pitzdev/web-service-gin/out/http"
-
 	"github.com/google/uuid"
+	"pitzdev/web-service-gin/models"
+	"pitzdev/web-service-gin/out"
 )
 
 type AnalyseControllerInterface interface {
@@ -18,8 +16,8 @@ type AnalyseControllerInterface interface {
 }
 
 type AnalyseController struct {
-	httpClient   *http.Client
-	analyseQueue []models.Analyse
+	httpClient   *out.Client
+	analyseQueue []models.Analyse // I need to change this to be a MAP
 }
 
 func (c *AnalyseController) ScheduleExecution(analyse *models.Analyse) error {
@@ -72,7 +70,7 @@ func (c *AnalyseController) RemoveAnalyse(analyseToRemove *models.Analyse) error
 	return errors.New("analyse not found")
 }
 
-func New(httpClient *http.Client) *AnalyseController {
+func New(httpClient *out.Client) *AnalyseController {
 	return &AnalyseController{
 		httpClient:   httpClient,
 		analyseQueue: []models.Analyse{},

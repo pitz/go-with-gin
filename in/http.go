@@ -1,20 +1,17 @@
-package http
+package in
 
 import (
-	"net/http"
-
-	"pitzdev/web-service-gin/controllers"
-	"pitzdev/web-service-gin/in/adapters"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"pitzdev/web-service-gin/internal"
 )
 
-type AnalyseHandler struct {
-	controller controllers.AnalyseControllerInterface
+type Http struct {
+	controller internal.AnalyseControllerInterface
 }
 
-func (h *AnalyseHandler) ExecuteAnalyse(context *gin.Context) {
-	analyse, parsingErr := adapters.ParseAnalyse(context)
+func (h *Http) ExecuteAnalyse(context *gin.Context) {
+	analyse, parsingErr := ParseAnalyse(context)
 	if parsingErr != nil {
 		context.JSON(
 			http.StatusBadRequest,
@@ -36,6 +33,6 @@ func (h *AnalyseHandler) ExecuteAnalyse(context *gin.Context) {
 	)
 }
 
-func New(controller controllers.AnalyseControllerInterface) *AnalyseHandler {
-	return &AnalyseHandler{controller: controller}
+func New(controller internal.AnalyseControllerInterface) *Http {
+	return &Http{controller: controller}
 }

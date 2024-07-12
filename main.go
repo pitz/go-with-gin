@@ -2,41 +2,36 @@ package main
 
 import (
 	"fmt"
-	"time"
 
-	"pitzdev/web-service-gin/controllers"
-	httpIn "pitzdev/web-service-gin/in/http"
-	"pitzdev/web-service-gin/in/jobs"
-	httpOut "pitzdev/web-service-gin/out/http"
+	"pitzdev/web-service-gin/in"
+	"pitzdev/web-service-gin/internal"
+	"pitzdev/web-service-gin/out"
+
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron"
 )
 
-func routingOrchestrator(router *gin.Engine, httpServer *httpIn.AnalyseHandler) {
+func routingOrchestrator(router *gin.Engine, httpServer *in.Http) {
 	router.POST("/analyse", httpServer.ExecuteAnalyse)
-
-	// router.GET("/analyse", handlers.GetWorkout)
-	// router.GET("/workouts/:id/executions", handlers.ListWorkoutExecutions)
-	// router.GET("/workouts/:id/executions/:id", handlers.GetWorkoutExecution)
-	// router.POST("/workouts/:id/executions/", handlers.GetWorkoutExecution)
 }
 
-func scheduleJobs(analyseController *controllers.AnalyseController) {
+func scheduleJobs(analyseController *internal.AnalyseController) {
 	c := cron.New()
 
 	c.AddFunc("@every 10s", func() {
 		fmt.Println("Cron job running at:", time.Now())
-		jobs.ProcessQueue(analyseController)
+		in.ProcessQueue(analyseController)
 	})
 
 	c.Start()
 }
 
 func main() {
-	httpClient := httpOut.New()
-	analyseController := controllers.New(httpClient)
-	httpServer := httpIn.New(analyseController)
+	httpClient := out.New()
+	analyseController := internal.New(httpClient)
+	httpServer := in.New(analyseController)
 
 	testingGoroutine()
 	scheduleJobs(analyseController)

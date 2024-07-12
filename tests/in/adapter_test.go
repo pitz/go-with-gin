@@ -1,14 +1,13 @@
-package adapters
+package in
 
 import (
 	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"pitzdev/web-service-gin/in"
+	"pitzdev/web-service-gin/models"
 	"testing"
-
-	schemas "pitzdev/web-service-gin/in/schemas"
-	models "pitzdev/web-service-gin/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +19,7 @@ func TestParseAnalyse(t *testing.T) {
 
 	t.Run("Successful parsing", func(t *testing.T) {
 		// given an valid payload
-		postAnalyse := schemas.PostAnalyse{
+		postAnalyse := in.PostAnalyse{
 			ExternalId: "external-id-1",
 			Type:       "type-1",
 			UserTaxId:  "tax-id-1",
@@ -35,7 +34,7 @@ func TestParseAnalyse(t *testing.T) {
 		requestContext.Request = req
 
 		// when calling the ParseAnalyse with the request-context
-		analyse, err := ParseAnalyse(requestContext)
+		analyse, err := in.ParseAnalyse(requestContext)
 
 		// should return a valid parsed Analyse
 		assert.Equal(t, postAnalyse.ExternalId, analyse.ExternalId)
@@ -58,7 +57,7 @@ func TestParseAnalyse(t *testing.T) {
 		requestContext.Request = req
 
 		// when calling the ParseAnalyse with the request-context
-		analyse, err := ParseAnalyse(requestContext)
+		analyse, err := in.ParseAnalyse(requestContext)
 
 		// should return nil
 		assert.Error(t, err)

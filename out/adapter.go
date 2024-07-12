@@ -1,14 +1,12 @@
-package adapters
+package out
 
 import (
 	"encoding/json"
 	"math/rand"
-
-	schemas "pitzdev/web-service-gin/out/schemas"
 )
 
 func ParseScore(body []byte) (int, error) {
-	var scoreResp schemas.Score
+	var scoreResp Score
 	err := json.Unmarshal(body, &scoreResp)
 	if err != nil {
 		return 0, err

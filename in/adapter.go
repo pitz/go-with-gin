@@ -1,14 +1,12 @@
-package adapters
+package in
 
 import (
-	schemas "pitzdev/web-service-gin/in/schemas"
-	models "pitzdev/web-service-gin/models"
-
 	"github.com/gin-gonic/gin"
+	"pitzdev/web-service-gin/models"
 )
 
 func ParseAnalyse(context *gin.Context) (*models.Analyse, error) {
-	var postAnalyse schemas.PostAnalyse
+	var postAnalyse PostAnalyse
 
 	err := context.BindJSON(&postAnalyse)
 	if err != nil {

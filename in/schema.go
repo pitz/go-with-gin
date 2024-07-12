@@ -1,7 +1,7 @@
-package schemas
+package in
 
 import (
-	models "pitzdev/web-service-gin/models"
+	"pitzdev/web-service-gin/models"
 )
 
 type PostAnalyse struct {

@@ -1,12 +1,10 @@
-package http
+package out
 
 import (
 	"fmt"
 	"io"
 	"net/http"
-
 	"pitzdev/web-service-gin/models"
-	"pitzdev/web-service-gin/out/adapters"
 )
 
 type Client struct{}
@@ -33,7 +31,7 @@ func (h *Client) GetScore(analyse *models.Analyse) (int, error) {
 		return 0, err
 	}
 
-	score, err := adapters.ParseScore(body)
+	score, err := ParseScore(body)
 	if err != nil {
 		fmt.Printf("[GetScore] Error parsing response body for Analyse %v: %v\n. It's going to use fallback.", analyse.ID(), err)
 		return 0, nil

@@ -1,18 +1,17 @@
-package jobs
+package in
 
 import (
 	"fmt"
+	"pitzdev/web-service-gin/internal"
 	"sync"
 	"time"
-
-	"pitzdev/web-service-gin/controllers"
 )
 
 var (
 	mu sync.Mutex
 )
 
-func ProcessQueue(analyseController *controllers.AnalyseController) {
+func ProcessQueue(analyseController *internal.AnalyseController) {
 	fmt.Println("ProcessQueue: ", time.Now())
 	fmt.Println("- Queue: ", len(*analyseController.AnalyseQueue()))
 
@@ -22,6 +21,4 @@ func ProcessQueue(analyseController *controllers.AnalyseController) {
 	for _, analyse := range *analyseController.AnalyseQueue() {
 		analyseController.ExecuteAnalyse(&analyse)
 	}
-
-	// controllers.AnalyseQueue = []models.Analyse{}
 }

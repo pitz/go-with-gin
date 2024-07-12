@@ -1,10 +1,11 @@
-package http
+package in
 
 import (
 	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"pitzdev/web-service-gin/in"
 	"pitzdev/web-service-gin/models"
 	"testing"
 
@@ -42,7 +43,7 @@ func TestExecuteAnalyse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockController := new(MockAnalyseController)
-	handler := New(mockController)
+	handler := in.New(mockController)
 
 	t.Run("Testing valid analyse", func(t *testing.T) {
 		// given a valid analyse
@@ -99,7 +100,7 @@ func TestExecuteAnalyse(t *testing.T) {
 	//		Type:       "type-1",
 	//	}
 	//	jsonPayload, _ := json.Marshal(postAnalyse)
-	//	req, _ := http.NewRequest(http.MethodPost, "/analyse", bytes.NewBuffer(jsonPayload))
+	//	req, _ := in.NewRequest(in.MethodPost, "/analyse", bytes.NewBuffer(jsonPayload))
 	//	req.Header.Set("Content-Type", "application/json")
 	//	w := httptest.NewRecorder()
 	//	context, _ := gin.CreateTestContext(w)
@@ -109,7 +110,7 @@ func TestExecuteAnalyse(t *testing.T) {
 	//	handler.ExecuteAnalyse(context)
 	//
 	//	// should return error because was not able to schedule the analyse
-	//	assert.Equal(t, http.StatusBadRequest, w.Code)
+	//	assert.Equal(t, in.StatusBadRequest, w.Code)
 	//	assert.Contains(t, w.Body.String(), "error")
 	//	mockController.AssertCalled(t, "ScheduleExecution", mock.AnythingOfType("*models.Analyse"))
 	//})
