@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"pitzdev/web-service-gin/internal"
 	"sync"
-	"time"
 )
 
 var (
@@ -16,8 +15,10 @@ func ProcessQueue(c *internal.AnalyseController) {
 	defer mu.Unlock()
 
 	for _, analyse := range c.PendingQueue() {
-		c.ExecuteAnalyse(analyse)
-	}
+		err := c.ExecuteAnalyse(analyse)
 
-	fmt.Println("DONE: ", time.Now())
+		if err != nil {
+			fmt.Println("[ProcessQueue] Error when processing job: ", err)
+		}
+	}
 }
