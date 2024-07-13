@@ -20,7 +20,7 @@ func routingOrchestrator(router *gin.Engine, httpServer *in.Http) {
 func scheduleJobs(analyseController *internal.AnalyseController) {
 	c := cron.New()
 
-	c.AddFunc("@every 10s", func() {
+	c.AddFunc("@every 1s", func() {
 		fmt.Println("Cron job running at:", time.Now())
 		in.ProcessQueue(analyseController)
 	})

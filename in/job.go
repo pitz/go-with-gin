@@ -12,12 +12,12 @@ var (
 )
 
 func ProcessQueue(c *internal.AnalyseController) {
-	fmt.Println("ProcessQueue: ", time.Now())
-
 	mu.Lock()
 	defer mu.Unlock()
 
 	for _, analyse := range c.PendingQueue() {
 		c.ExecuteAnalyse(analyse)
 	}
+
+	fmt.Println("DONE: ", time.Now())
 }

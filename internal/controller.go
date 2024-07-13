@@ -55,12 +55,10 @@ func (c *AnalyseController) ExecuteAnalyse(externalId string) error {
 	go c.httpClient.GetAdyenScore(&analyse, ch)
 	go c.httpClient.GetTransunionScore(&analyse, ch)
 
-	var score models.Score
-	score = <-ch
-	fmt.Println("1. Score: ", score)
-
-	score = <-ch
-	fmt.Println("2. Score: ", score)
+	score := make([]models.Score, 2)
+	score[0] = <-ch
+	score[1] = <-ch
+	fmt.Println("Scores: ", score)
 
 	err := c.RemoveAnalyse(&analyse)
 	if err != nil {
