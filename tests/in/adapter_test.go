@@ -17,14 +17,15 @@ func TestParseAnalyse(t *testing.T) {
 	// setup
 	gin.SetMode(gin.TestMode)
 
+	validPostAnalyse := in.PostAnalyse{
+		ExternalId: "external-id-1",
+		Type:       "type-1",
+		UserTaxId:  "tax-id-1",
+	}
+
 	t.Run("Successful parsing", func(t *testing.T) {
 		// given an valid payload
-		postAnalyse := in.PostAnalyse{
-			ExternalId: "external-id-1",
-			Type:       "type-1",
-			UserTaxId:  "tax-id-1",
-		}
-		jsonPayload, _ := json.Marshal(postAnalyse)
+		jsonPayload, _ := json.Marshal(validPostAnalyse)
 		req, _ := http.NewRequest(http.MethodPost, "/analyse", bytes.NewBuffer(jsonPayload))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -37,9 +38,9 @@ func TestParseAnalyse(t *testing.T) {
 		analyse, err := in.ParseAnalyse(requestContext)
 
 		// should return a valid parsed Analyse
-		assert.Equal(t, postAnalyse.ExternalId, analyse.ExternalId)
-		assert.Equal(t, postAnalyse.Type, analyse.Type)
-		assert.Equal(t, postAnalyse.UserTaxId, analyse.UserTaxId)
+		assert.Equal(t, validPostAnalyse.ExternalId, analyse.ExternalId)
+		assert.Equal(t, validPostAnalyse.Type, analyse.Type)
+		assert.Equal(t, validPostAnalyse.UserTaxId, analyse.UserTaxId)
 
 		// and should not throw any error
 		assert.NoError(t, err)
