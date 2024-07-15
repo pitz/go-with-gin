@@ -16,8 +16,9 @@ type AnalyseControllerInterface interface {
 }
 
 type AnalyseController struct {
-	httpClient   *out.Client
-	analyseQueue map[string]models.Analyse
+	adyenClient      out.ClientInterface
+	transUnionClient out.ClientInterface
+	analyseQueue     map[string]models.Analyse
 }
 
 func (c *AnalyseController) ScheduleExecution(analyse *models.Analyse) error {
@@ -52,8 +53,8 @@ func (c *AnalyseController) ExecuteAnalyse(externalId string) error {
 	}
 
 	ch := make(chan models.Score)
-	go c.httpClient.GetAdyenScore(&analyse, ch)
-	go c.httpClient.GetTransunionScore(&analyse, ch)
+	go c.adyenClient.GetScore(&analyse, ch)
+	go c.transUnionClient.GetScore(&analyse, ch)
 
 	score := make([]models.Score, 2)
 	score[0] = <-ch
@@ -91,9 +92,13 @@ func (c *AnalyseController) RemoveAnalyse(toRemove *models.Analyse) error {
 	return errors.New("analyse not found")
 }
 
-func New(httpClient *out.Client) *AnalyseController {
+func New(
+	adyenClient out.ClientInterface,
+	transUnionClient out.ClientInterface,
+) *AnalyseController {
 	return &AnalyseController{
-		httpClient:   httpClient,
-		analyseQueue: make(map[string]models.Analyse),
+		adyenClient:      adyenClient,
+		transUnionClient: transUnionClient,
+		analyseQueue:     make(map[string]models.Analyse),
 	}
 }

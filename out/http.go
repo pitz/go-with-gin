@@ -8,70 +8,89 @@ import (
 	"time"
 )
 
-type Client struct{}
-
-func New() *Client {
-	return &Client{}
+type ClientInterface interface {
+	GetScore(analyse *models.Analyse, ch chan models.Score)
 }
 
-func (h *Client) GetAdyenScore(analyse *models.Analyse, ch chan models.Score) {
-	fmt.Printf("[GetAdyenScore] Fetching score for Analyse %v\n", analyse.ID())
+type AdyenClient struct{}
 
-	time.Sleep(1000 * time.Millisecond)
+func NewAdyen() *AdyenClient {
+	return &AdyenClient{}
+}
+
+func (h *AdyenClient) GetScore(analyse *models.Analyse, ch chan models.Score) {
+	time.Sleep(1000 * time.Millisecond) // temp
+
+	score := models.Score{Type: models.Adyen}
 	url := "https://gingo.free.beeceptor.com/api/users"
 
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("[GetAdyenScore] Error fetching score for Analyse %v: %v\n", analyse.ID(), err)
-		ch <- models.Score{Error: err}
+		fmt.Printf("[AdyenClient] Error fetching score for Analyse %v: %v\n", analyse.ID(), err)
+		score.Error = err
+		ch <- score
 		return
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("[GetAdyenScore] Error reading response body for Analyse %v: %v\n", analyse.ID(), err)
-		ch <- models.Score{Error: err}
+		fmt.Printf("[AdyenClient] Error reading response body for Analyse %v: %v\n", analyse.ID(), err)
+		score.Error = err
+		ch <- score
 		return
 	}
 
-	score, err := ParseScore(body)
+	adyenScore, err := ParseScore(body)
 	if err != nil {
-		fmt.Printf("[GetAdyenScore] Error parsing response body for Analyse %v: %v\n It's going to use fallback.\n\n", analyse.ID(), err)
-		ch <- models.Score{Error: nil, Score: 20}
+		fmt.Printf("[AdyenClient] Error parsing response body for Analyse %v: %v\n It's going to use fallback.\n\n", analyse.ID(), err)
+		score.Score = 20
+		ch <- score
 		return
 	}
 
-	ch <- models.Score{Error: nil, Score: score}
+	score.Score = adyenScore
+	ch <- score
 }
 
-func (h *Client) GetTransunionScore(analyse *models.Analyse, ch chan models.Score) {
-	fmt.Printf("[GetTransunionScore] Fetching person background for Analyse %v\n", analyse.ID())
+type TransUnionClient struct{}
 
-	time.Sleep(10000 * time.Millisecond)
+func NewTransUnion() *TransUnionClient {
+	return &TransUnionClient{}
+}
+
+func (h *TransUnionClient) GetScore(analyse *models.Analyse, ch chan models.Score) {
+	time.Sleep(5000 * time.Millisecond)
+
+	score := models.Score{Type: models.TransUnion}
 	url := "https://gingo.free.beeceptor.com/api/users"
 
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Printf("[GetTransunionScore] Error fetching person background for Analyse %v: %v\n", analyse.ID(), err)
-		ch <- models.Score{Error: err}
+		fmt.Printf("[TransUnionClient] Error fetching person background for Analyse %v: %v\n", analyse.ID(), err)
+		score.Error = err
+		ch <- score
 		return
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("[GetTransunionScore] Error reading response body for Analyse %v: %v\n", analyse.ID(), err)
-		ch <- models.Score{Error: err}
+		fmt.Printf("[TransUnionClient] Error reading response body for Analyse %v: %v\n", analyse.ID(), err)
+		score.Error = err
+		ch <- score
 		return
 	}
 
-	score, err := ParseScore(body)
+	transUnionScore, err := ParseScore(body)
 	if err != nil {
-		fmt.Printf("[GetTransunionScore] Error parsing response body for Analyse %v: %v\n It's going to use fallback.\n\n", analyse.ID(), err)
-		ch <- models.Score{Error: nil, Score: 10}
+		fmt.Printf("[TransUnionClient] Error parsing response body for Analyse %v: %v\n It's going to use fallback.\n\n", analyse.ID(), err)
+		score.Score = 10
+		ch <- score
 		return
 	}
 
-	ch <- models.Score{Error: nil, Score: score}
+	ch <- models.Score{Error: nil, Score: transUnionScore}
 }
+
+// This should be in diff files.

@@ -6,11 +6,15 @@ import (
 	"pitzdev/web-service-gin/internal"
 )
 
-type Http struct {
+type ServerInterface interface {
+	ExecuteAnalyse(context *gin.Context)
+}
+
+type Server struct {
 	controller internal.AnalyseControllerInterface
 }
 
-func (h *Http) ExecuteAnalyse(context *gin.Context) {
+func (h *Server) ExecuteAnalyse(context *gin.Context) {
 	analyse, parsingErr := ParseAnalyse(context)
 	if parsingErr != nil {
 		context.JSON(
@@ -32,6 +36,6 @@ func (h *Http) ExecuteAnalyse(context *gin.Context) {
 	)
 }
 
-func New(controller internal.AnalyseControllerInterface) *Http {
-	return &Http{controller: controller}
+func New(c internal.AnalyseControllerInterface) *Server {
+	return &Server{controller: c}
 }

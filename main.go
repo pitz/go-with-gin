@@ -1,50 +1,39 @@
 package main
 
 import (
-	"fmt"
-
 	"pitzdev/web-service-gin/in"
 	"pitzdev/web-service-gin/internal"
 	"pitzdev/web-service-gin/out"
-
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron"
 )
 
-func routingOrchestrator(router *gin.Engine, httpServer *in.Http) {
-	router.POST("/analyse", httpServer.ExecuteAnalyse)
+func routingOrchestrator(router *gin.Engine, http in.ServerInterface) {
+	router.POST("/analyse", http.ExecuteAnalyse)
 }
 
-func scheduleJobs(analyseController *internal.AnalyseController) {
+func scheduleJobs(controller *internal.AnalyseController) {
 	c := cron.New()
 
 	c.AddFunc("@every 1s", func() {
-		fmt.Println("Cron job running at:", time.Now())
-		in.ProcessQueue(analyseController)
+		in.ProcessQueue(controller)
 	})
 
 	c.Start()
 }
 
 func main() {
-	httpClient := out.New()
-	analyseController := internal.New(httpClient)
-	httpServer := in.New(analyseController)
+	adyenClient := out.NewAdyen()
+	transunionClient := out.NewTransUnion()
 
-	testingGoroutine()
-	scheduleJobs(analyseController)
+	controller := internal.New(adyenClient, transunionClient)
+	server := in.New(controller)
+
+	scheduleJobs(controller)
 
 	router := gin.Default()
-	routingOrchestrator(router, httpServer)
+	routingOrchestrator(router, server)
 
 	router.Run("localhost:8080")
 }
-
-// Lending Orchestrator
-// - Receives the tax-id (document)
-// - Break the flow into steps (read it from a file)
-// - Get the flow to execute (get it from a map - try to use a random based on experiment)
-// - Execute step
-// - Send to the next step

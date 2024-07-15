@@ -10,7 +10,7 @@ var (
 	mu sync.Mutex
 )
 
-func ProcessQueue(c *internal.AnalyseController) {
+func ProcessQueue(c internal.AnalyseControllerInterface) {
 	mu.Lock()
 	defer mu.Unlock()
 

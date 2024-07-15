@@ -22,7 +22,15 @@ func (analyse *Analyse) SetID(analyseId string) {
 	analyse.id = analyseId
 }
 
+type ScoreType string
+
+const (
+	TransUnion ScoreType = "TransUnion"
+	Adyen      ScoreType = "Adyen"
+)
+
 type Score struct {
 	Score int
 	Error error
+	Type  ScoreType
 }
