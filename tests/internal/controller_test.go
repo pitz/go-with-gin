@@ -131,11 +131,11 @@ func TestAnalyseController_ExecuteAnalyse(t *testing.T) {
 	t.Run("Analysing a valid item", func(t *testing.T) {
 		// given a valid Adyen response
 		adyenScore := models.Score{Score: 15, Type: "Adyen"}
-		mockedAdyenClient.On("GetScore", validAnalyse, mock.AnythingOfType("chan models.Score")).Return(adyenScore).Once()
+		mockedAdyenClient.On("GetScore", validAnalyse, mock.AnythingOfType("chan<- models.Score")).Return(adyenScore).Once()
 
 		// and a valid TransUnion response
 		transunionScore := models.Score{Score: 29, Type: "TransUnion"}
-		mockedTransUnionClient.On("GetScore", validAnalyse, mock.AnythingOfType("chan models.Score")).Return(transunionScore).Once()
+		mockedTransUnionClient.On("GetScore", validAnalyse, mock.AnythingOfType("chan<- models.Score")).Return(transunionScore).Once()
 
 		// and a mocked controller
 		mockedController := internal.New(mockedAdyenClient, mockedTransUnionClient)

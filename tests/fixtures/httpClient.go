@@ -9,7 +9,7 @@ type MockClient struct {
 	mock.Mock
 }
 
-func (m *MockClient) GetScore(analyse *models.Analyse, ch chan models.Score) {
+func (m *MockClient) GetScore(analyse *models.Analyse, ch chan<- models.Score) {
 	args := m.Called(analyse, ch)
 	score := args.Get(0).(models.Score)
 

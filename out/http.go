@@ -9,7 +9,7 @@ import (
 )
 
 type ClientInterface interface {
-	GetScore(analyse *models.Analyse, ch chan models.Score)
+	GetScore(analyse *models.Analyse, ch chan<- models.Score)
 }
 
 type AdyenClient struct{}
@@ -18,7 +18,7 @@ func NewAdyen() *AdyenClient {
 	return &AdyenClient{}
 }
 
-func (h *AdyenClient) GetScore(analyse *models.Analyse, ch chan models.Score) {
+func (h *AdyenClient) GetScore(analyse *models.Analyse, ch chan<- models.Score) {
 	time.Sleep(1000 * time.Millisecond) // temp
 
 	score := models.Score{Type: models.Adyen}
@@ -59,7 +59,7 @@ func NewTransUnion() *TransUnionClient {
 	return &TransUnionClient{}
 }
 
-func (h *TransUnionClient) GetScore(analyse *models.Analyse, ch chan models.Score) {
+func (h *TransUnionClient) GetScore(analyse *models.Analyse, ch chan<- models.Score) {
 	time.Sleep(5000 * time.Millisecond)
 
 	score := models.Score{Type: models.TransUnion}

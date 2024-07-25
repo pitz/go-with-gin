@@ -57,8 +57,9 @@ func (c *AnalyseController) ExecuteAnalyse(externalId string) error {
 	go c.transUnionClient.GetScore(&analyse, ch)
 
 	score := make([]models.Score, 2)
-	score[0] = <-ch
-	score[1] = <-ch
+	for i := 0; i < 2; i++ {
+		score[i] = <-ch
+	}
 	fmt.Println("Scores: ", score)
 
 	err := c.RemoveAnalyse(&analyse)
